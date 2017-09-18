@@ -474,7 +474,7 @@ def evaluate_twitter_methods():
 
 
 def run_method(positive_seeds, negative_seeds, embeddings, transform_embeddings=False, post_densify=False,
-        method=polarity_induction_methods.densify, **kwargs):
+        method=polarity_induction_methods.random_walk, **kwargs):
     if transform_embeddings:
         print "Transforming embeddings..."
         embeddings = embedding_transformer.apply_embedding_transformation(embeddings, positive_seeds, negative_seeds, n_dim=50)

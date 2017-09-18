@@ -4,11 +4,14 @@ from socialsent.polarity_induction_methods import random_walk
 from socialsent.evaluate_methods import binary_metrics
 from socialsent.representations.representation_factory import create_representation
 
+
 if __name__ == "__main__":
     print "Evaluting SentProp with 100 dimensional GloVe embeddings"
     print "Evaluting only binary classification performance on General Inquirer lexicon"
     lexicon = lexicons.load_lexicon("inquirer", remove_neutral=True)
     pos_seeds, neg_seeds = seeds.hist_seeds()
+    print pos_seeds
+
     seeds_map = {1:pos_seeds, -1:neg_seeds}
     embeddings = create_representation("GIGA", "data/example_embeddings/glove.6B.100d.txt",
         set(lexicon.keys()).union(pos_seeds).union(neg_seeds))

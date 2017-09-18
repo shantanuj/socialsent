@@ -126,6 +126,7 @@ def get_model(inputdim, outputdim, regularization_strength=0.01, lr=0.000, cosin
     transformation = Dense(inputdim, init='identity',
                            W_constraint=Orthogonal())
 
+    print inputdim, outputdim
     model = Graph()
     model.add_input(name='embeddings1', input_shape=(inputdim,))
     model.add_input(name='embeddings2', input_shape=(inputdim,))
@@ -143,7 +144,7 @@ def get_model(inputdim, outputdim, regularization_strength=0.01, lr=0.000, cosin
         model.add_node(Lambda(lambda x: K.reshape(K.sum(x, axis=1), (x.shape[0], 1))),
                        name='distances', inputs=['normalized1', 'negnormalized2'], merge_mode='mul')
     else:
-        model.add_node(Lambda(lambda x: K.reshape(K.sqrt(K.sum(x * x, axis=1)), (x.shape[0], 1))),
+        model.add_node(Lambda(lambda x: K.reshape(K.sqrt(K.sum(x * x, axis=1)), (-1, 1))),
                        name='distances', inputs=['projected1', 'negprojected2'], merge_mode='sum')
 
     model.add_output(name='y', input='distances')
@@ -160,7 +161,7 @@ def apply_embedding_transformation(embeddings, positive_seeds, negative_seeds,
     model = get_model(embeddings.m.shape[1], n_dim, **kwargs)
 
     print "Learning embedding transformation"
-#    prog = util.Progbar(n_epochs)
+    prog = util.Progbar(n_epochs)
     for epoch in range(n_epochs):
         dataset.shuffle()
         loss = 0
@@ -170,7 +171,7 @@ def apply_embedding_transformation(embeddings, positive_seeds, negative_seeds,
             if force_orthogonal:
                 Q = orthogonalize(Q)
             model.set_weights([Q, np.zeros_like(b)])
-#        prog.update(epoch + 1, exact_values=[('loss', loss / dataset.y.size)])
+        prog.update(epoch + 1, exact_values=[('loss', loss / dataset.y.size)])
     Q, b = model.get_weights()
     new_mat = embeddings.m.dot(Q)[:,0:n_dim]
     #print "Orthogonality rmse", np.mean(np.sqrt(
